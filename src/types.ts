@@ -103,7 +103,8 @@ export interface OccurrenceResponse {
 }
 
 export interface ListProjectsResponse {
-  projects: RollbarProject[];
+  err: number;
+  result: RollbarProject[];
 }
 
 export interface ProjectResponse {

@@ -17,6 +17,8 @@ MCP server implementation for Rollbar API integration, enabling LLMs to interact
 ### Environment Variables
 
 - `ROLLBAR_ACCESS_TOKEN`: Your Rollbar access token (required)
+- `ROLLBAR_PROJECT_ID`: Default project ID to use when not specified in requests (optional)
+- `ROLLBAR_PROJECT_NAME`: Name of default project for reference (optional)
 
 You can obtain a Rollbar access token from your Rollbar account:
 1. Log in to your Rollbar account at https://rollbar.com/
@@ -44,7 +46,9 @@ Add to your `~/.cursor/mcp.json`:
         "command": "YOUR_NODE_PATH",
         "args": ["YOUR_PROJECT_PATH/mcp-rollbar-server/dist/src/index.js"],
         "env": {
-          "ROLLBAR_ACCESS_TOKEN": "YOUR_ACCESS_TOKEN"
+          "ROLLBAR_ACCESS_TOKEN": "YOUR_ACCESS_TOKEN",
+          "ROLLBAR_PROJECT_ID": "YOUR_PROJECT_ID",
+          "ROLLBAR_PROJECT_NAME": "YOUR_PROJECT_NAME"
         }
       }
     }

@@ -12,6 +12,7 @@ import {
   ListUsersResponse,
   OccurrenceResponse,
   ProjectResponse,
+  RollbarProject,
   UserResponse,
 } from "./types.js";
 
@@ -19,6 +20,41 @@ if (!process.env.ROLLBAR_ACCESS_TOKEN) {
   console.error("Required environment variable ROLLBAR_ACCESS_TOKEN is not set");
   process.exit(1);
 }
+
+// プロジェクト名とIDの環境変数（オプション）
+const ROLLBAR_PROJECT_NAME = process.env.ROLLBAR_PROJECT_NAME;
+const ROLLBAR_PROJECT_ID = process.env.ROLLBAR_PROJECT_ID ? parseInt(process.env.ROLLBAR_PROJECT_ID, 10) : undefined;
+
+// プロジェクト名からプロジェクトIDを検索する関数
+const findProjectIdByName = async (projectName: string): Promise<number | undefined> => {
+  try {
+    const response = await client.get<ListProjectsResponse>('/projects');
+    const projects = response.data.result;
+    
+    const project = projects.find((p: RollbarProject) => p.name === projectName);
+    return project?.id;
+  } catch (error) {
+    console.error('Error finding project by name:', error);
+    return undefined;
+  }
+};
+
+// 環境変数またはプロジェクト名からプロジェクトIDを取得する関数
+const getEffectiveProjectId = async (providedId?: number): Promise<number | undefined> => {
+  // 提供されたIDがある場合はそれを使用
+  if (providedId) return providedId;
+  
+  // 環境変数にプロジェクトIDがある場合はそれを使用
+  if (ROLLBAR_PROJECT_ID) return ROLLBAR_PROJECT_ID;
+  
+  // プロジェクト名から検索
+  if (ROLLBAR_PROJECT_NAME) {
+    const idFromName = await findProjectIdByName(ROLLBAR_PROJECT_NAME);
+    if (idFromName) return idFromName;
+  }
+  
+  return undefined;
+};
 
 const API_BASE_URL = "https://api.rollbar.com/api/1";
 const client = axios.create({
@@ -286,7 +322,15 @@ export const createServer = () => {
 
         case "rollbar_get_project": {
           const { id } = args as { id: number };
-          const response = await client.get<ProjectResponse>(`/project/${id}`);
+          
+          // 環境変数のプロジェクトIDをデフォルト値として使用、またはプロジェクト名から検索
+          const effectiveProjectId = await getEffectiveProjectId(id);
+          
+          if (!effectiveProjectId) {
+            throw new Error("Project ID is required but not provided in request or environment variables");
+          }
+          
+          const response = await client.get<ProjectResponse>(`/project/${effectiveProjectId}`);
           return {
             content: [
               {
@@ -299,7 +343,15 @@ export const createServer = () => {
 
         case "rollbar_list_environments": {
           const { projectId } = args as { projectId: number };
-          const response = await client.get<ListEnvironmentsResponse>(`/project/${projectId}/environments`);
+          
+          // 環境変数のプロジェクトIDをデフォルト値として使用、またはプロジェクト名から検索
+          const effectiveProjectId = await getEffectiveProjectId(projectId);
+          
+          if (!effectiveProjectId) {
+            throw new Error("Project ID is required but not provided in request or environment variables");
+          }
+          
+          const response = await client.get<ListEnvironmentsResponse>(`/project/${effectiveProjectId}/environments`);
           return {
             content: [
               {
@@ -343,10 +395,17 @@ export const createServer = () => {
             page?: number;
           };
 
+          // 環境変数のプロジェクトIDをデフォルト値として使用、またはプロジェクト名から検索
+          const effectiveProjectId = await getEffectiveProjectId(projectId);
+          
+          if (!effectiveProjectId) {
+            throw new Error("Project ID is required but not provided in request or environment variables");
+          }
+
           const params: Record<string, string | number> = { page, limit };
           if (environment) params.environment = environment;
 
-          const response = await client.get<ListDeploysResponse>(`/project/${projectId}/deploys`, { params });
+          const response = await client.get<ListDeploysResponse>(`/project/${effectiveProjectId}/deploys`, { params });
           return {
             content: [
               {
