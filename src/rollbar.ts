@@ -34,7 +34,8 @@ const SUPPORTED_APIS = {
   // Project Tokenを使用するAPI
   projectApis: [
     "rollbar_list_items",
-    "rollbar_get_item", 
+    "rollbar_get_item",
+    "rollbar_get_item_by_counter",
     "rollbar_list_occurrences",
     "rollbar_get_occurrence",
     "rollbar_list_environments",
