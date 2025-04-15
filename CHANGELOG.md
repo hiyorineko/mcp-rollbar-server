@@ -5,27 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2024-03-26
+## [1.1.0] - 2024-04-15
 
 ### Added
-- Initial release with Kibela API integration
+- Environment variable expansion: Added support for `ROLLBAR_PROJECT_TOKEN` and `ROLLBAR_ACCOUNT_TOKEN`
+- Optimized token usage for different API endpoints
+- Added `.env.example` file
+- Added required tokens and API correspondence table to README
+
+### Changed
+- Removed support for the previous `ROLLBAR_ACCESS_TOKEN` environment variable
+- Updated README to explain the usage of new environment variables
+- Modified to work with only the necessary tokens depending on the API used (both tokens are no longer required)
+
+## [1.0.0] - 2024-04-15
+
+### Added
+- Initial release with Rollbar API integration
 - Core features:
-  - Note search with advanced filtering options
-  - Personal note management (latest notes, recently viewed)
-  - Note content and comments retrieval
-  - Group and folder management
-  - Group notes management (notes without folders)
-  - Folder notes management
-  - User interaction features (like/unlike notes)
-  - User listing functionality
-  - Note attachment viewing
-  - Path-based note retrieval
+  - Error items listing with filtering options
+  - Detailed error information retrieval
+  - Error occurrences tracking and viewing
+  - Project and environment management
+  - User listing and information retrieval
+  - Deployment tracking and monitoring
 - Integration support:
-  - Claude Desktop configuration
   - Cursor integration
   - Docker support
   - SSE transport capability
 - Development environment setup:
   - Local development configuration
   - Docker development workflow
-  - Environment variable management (KIBELA_TEAM, KIBELA_TOKEN)
+  - Environment variable management (ROLLBAR_ACCESS_TOKEN, ROLLBAR_PROJECT_ID, ROLLBAR_PROJECT_NAME)

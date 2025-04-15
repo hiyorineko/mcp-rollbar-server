@@ -16,14 +16,35 @@ MCP server implementation for Rollbar API integration, enabling LLMs to interact
 
 ### Environment Variables
 
-- `ROLLBAR_ACCESS_TOKEN`: Your Rollbar access token (required)
-- `ROLLBAR_PROJECT_ID`: Default project ID to use when not specified in requests (optional)
-- `ROLLBAR_PROJECT_NAME`: Name of default project for reference (optional)
+- `ROLLBAR_PROJECT_TOKEN`: Rollbar Project Access Token - プロジェクト内のエラー・デプロイ情報を取得するAPIに必要
+- `ROLLBAR_ACCOUNT_TOKEN`: Rollbar Account Access Token - アカウント全体のプロジェクト・ユーザー情報を取得するAPIに必要
+- `ROLLBAR_PROJECT_ID`: デフォルトのプロジェクトID（リクエストで指定されていない場合に使用）- オプション
+- `ROLLBAR_PROJECT_NAME`: 参照用のデフォルトプロジェクト名 - オプション
 
-You can obtain a Rollbar access token from your Rollbar account:
-1. Log in to your Rollbar account at https://rollbar.com/
-2. Go to Settings -> Account Access Tokens (for account-level access) or Settings -> Project Access Tokens (for project-level access)
-3. Create a new token with "read" scope
+> **注意**: 使用する機能に応じて、`ROLLBAR_PROJECT_TOKEN`または`ROLLBAR_ACCOUNT_TOKEN`のいずれか、あるいは両方が必要になります。
+> 全機能を使用するには両方の設定を推奨しますが、特定のAPIのみを使用する場合は該当するトークンのみで動作します。
+
+#### 必要なトークンとAPI対応表
+
+| API | 必要なトークン |
+|-----|-------------|
+| `rollbar_list_items` | ROLLBAR_PROJECT_TOKEN |
+| `rollbar_get_item` | ROLLBAR_PROJECT_TOKEN |
+| `rollbar_list_occurrences` | ROLLBAR_PROJECT_TOKEN |
+| `rollbar_get_occurrence` | ROLLBAR_PROJECT_TOKEN |
+| `rollbar_list_environments` | ROLLBAR_PROJECT_TOKEN |
+| `rollbar_list_deploys` | ROLLBAR_PROJECT_TOKEN |
+| `rollbar_get_deploy` | ROLLBAR_PROJECT_TOKEN |
+| `rollbar_list_projects` | ROLLBAR_ACCOUNT_TOKEN |
+| `rollbar_get_project` | ROLLBAR_ACCOUNT_TOKEN |
+| `rollbar_list_users` | ROLLBAR_ACCOUNT_TOKEN |
+| `rollbar_get_user` | ROLLBAR_ACCOUNT_TOKEN |
+
+Rollbarアクセストークンは以下の方法で取得できます：
+1. Rollbarアカウントにログイン（https://rollbar.com/）
+2. プロジェクトトークンの場合: Settings -> Project Access Tokens （プロジェクトレベルのアクセス用）
+3. アカウントトークンの場合: Settings -> Account Access Tokens （アカウントレベルのアクセス用）
+4. "read"スコープを持つ新しいトークンを作成
 
 ## How to use
 
@@ -46,7 +67,8 @@ Add to your `~/.cursor/mcp.json`:
         "command": "YOUR_NODE_PATH",
         "args": ["YOUR_PROJECT_PATH/mcp-rollbar-server/dist/src/index.js"],
         "env": {
-          "ROLLBAR_ACCESS_TOKEN": "YOUR_ACCESS_TOKEN",
+          "ROLLBAR_PROJECT_TOKEN": "YOUR_PROJECT_ACCESS_TOKEN",
+          "ROLLBAR_ACCOUNT_TOKEN": "YOUR_ACCOUNT_ACCESS_TOKEN",
           "ROLLBAR_PROJECT_ID": "YOUR_PROJECT_ID",
           "ROLLBAR_PROJECT_NAME": "YOUR_PROJECT_NAME"
         }
