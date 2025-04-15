@@ -11,7 +11,9 @@
     "mcp-rollbar-server": "dist/src/index.js"
   },
   "files": [
-    "dist"
+    "dist/src",
+    "dist/types.d.ts",
+    "dist/types.js"
   ],
   "repository": {
     "type": "git",
@@ -28,7 +30,8 @@
     "start": "node dist/src/index.js",
     "start:sse": "node dist/src/sse.js",
     "lint": "biome check .",
-    "lint:fix": "biome check --apply ."
+    "lint:fix": "biome check --apply .",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.0.1",
@@ -40,8 +43,11 @@
     "@biomejs/biome": "1.5.3",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
     "@types/node": "^20",
+    "jest": "^29.7.0",
     "shx": "^0.3.4",
+    "ts-jest": "^29.1.2",
     "typescript": "^5.6.2"
   }
 }
