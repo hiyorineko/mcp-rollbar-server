@@ -1,6 +1,6 @@
 {
   "name": "@hiyorineko/mcp-rollbar-server",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "MCP server for Rollbar API integration",
   "license": "MIT",
   "type": "module",
@@ -17,7 +17,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/hiyorineko/mcp-rollbar-server"
+    "url": "git+https://github.com/hiyorineko/mcp-rollbar-server.git"
   },
   "bugs": {
     "url": "https://github.com/hiyorineko/mcp-rollbar-server/issues"
