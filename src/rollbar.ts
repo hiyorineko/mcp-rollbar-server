@@ -353,7 +353,7 @@ export const createServer = () => {
 
         case "rollbar_get_item_by_counter": {
           const { counter } = args as { counter: number };
-          const response = await client.get(`/item_by_counter/${counter}`);
+          const response = await client.get<ItemResponse>(`/item_by_counter/${counter}`);
           return {
             content: [
               {
