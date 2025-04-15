@@ -150,6 +150,18 @@ const GET_ITEM_TOOL: Tool = {
   },
 };
 
+const GET_ITEM_BY_COUNTER_TOOL: Tool = {
+  name: "rollbar_get_item_by_counter",
+  description: "Get a specific item by project counter from Rollbar.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      counter: { type: "number", description: "Project counter for the item" },
+    },
+    required: ["counter"],
+  },
+};
+
 const LIST_OCCURRENCES_TOOL: Tool = {
   name: "rollbar_list_occurrences",
   description: "List occurrences of errors from Rollbar",
@@ -273,6 +285,7 @@ export const createServer = () => {
     tools: [
       LIST_ITEMS_TOOL,
       GET_ITEM_TOOL,
+      GET_ITEM_BY_COUNTER_TOOL,
       LIST_OCCURRENCES_TOOL,
       GET_OCCURRENCE_TOOL,
       LIST_PROJECTS_TOOL,
@@ -328,6 +341,19 @@ export const createServer = () => {
 
           const { id } = args as { id: number };
           const response = await projectClient.get<ItemResponse>(`/item/${id}`);
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(response.data, null, 2),
+              },
+            ],
+          };
+        }
+
+        case "rollbar_get_item_by_counter": {
+          const { counter } = args as { counter: number };
+          const response = await client.get(`/item_by_counter/${counter}`);
           return {
             content: [
               {
