@@ -30,6 +30,7 @@ MCP server implementation for Rollbar API integration, enabling LLMs to interact
 |-----|-------------|
 | `rollbar_list_items` | ROLLBAR_PROJECT_TOKEN |
 | `rollbar_get_item` | ROLLBAR_PROJECT_TOKEN |
+| `rollbar_get_item_by_counter` | ROLLBAR_PROJECT_TOKEN |
 | `rollbar_list_occurrences` | ROLLBAR_PROJECT_TOKEN |
 | `rollbar_get_occurrence` | ROLLBAR_PROJECT_TOKEN |
 | `rollbar_list_environments` | ROLLBAR_PROJECT_TOKEN |
