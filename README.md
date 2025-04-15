@@ -16,17 +16,17 @@ MCP server implementation for Rollbar API integration, enabling LLMs to interact
 
 ### Environment Variables
 
-- `ROLLBAR_PROJECT_TOKEN`: Rollbar Project Access Token - プロジェクト内のエラー・デプロイ情報を取得するAPIに必要
-- `ROLLBAR_ACCOUNT_TOKEN`: Rollbar Account Access Token - アカウント全体のプロジェクト・ユーザー情報を取得するAPIに必要
-- `ROLLBAR_PROJECT_ID`: デフォルトのプロジェクトID（リクエストで指定されていない場合に使用）- オプション
-- `ROLLBAR_PROJECT_NAME`: 参照用のデフォルトプロジェクト名 - オプション
+- `ROLLBAR_PROJECT_TOKEN`: Rollbar Project Access Token - Required for APIs to retrieve project error and deployment information
+- `ROLLBAR_ACCOUNT_TOKEN`: Rollbar Account Access Token - Required for APIs to access account-wide project and user information
+- `ROLLBAR_PROJECT_ID`: Default project ID (used when not specified in requests) - Optional
+- `ROLLBAR_PROJECT_NAME`: Default project name for reference - Optional
 
-> **注意**: 使用する機能に応じて、`ROLLBAR_PROJECT_TOKEN`または`ROLLBAR_ACCOUNT_TOKEN`のいずれか、あるいは両方が必要になります。
-> 全機能を使用するには両方の設定を推奨しますが、特定のAPIのみを使用する場合は該当するトークンのみで動作します。
+> **Note**: Depending on the features you use, you'll need either `ROLLBAR_PROJECT_TOKEN`, `ROLLBAR_ACCOUNT_TOKEN`, or both.
+> For full functionality, it's recommended to configure both tokens, but the service will work with only the relevant token for specific APIs.
 
-#### 必要なトークンとAPI対応表
+#### Required Tokens and API Correspondence Table
 
-| API | 必要なトークン |
+| API | Required Token |
 |-----|-------------|
 | `rollbar_list_items` | ROLLBAR_PROJECT_TOKEN |
 | `rollbar_get_item` | ROLLBAR_PROJECT_TOKEN |
@@ -40,15 +40,15 @@ MCP server implementation for Rollbar API integration, enabling LLMs to interact
 | `rollbar_list_users` | ROLLBAR_ACCOUNT_TOKEN |
 | `rollbar_get_user` | ROLLBAR_ACCOUNT_TOKEN |
 
-Rollbarアクセストークンは以下の方法で取得できます：
-1. Rollbarアカウントにログイン（https://rollbar.com/）
-2. プロジェクトトークンの場合: Settings -> Project Access Tokens （プロジェクトレベルのアクセス用）
-3. アカウントトークンの場合: Settings -> Account Access Tokens （アカウントレベルのアクセス用）
-4. "read"スコープを持つ新しいトークンを作成
+You can obtain Rollbar access tokens as follows:
+1. Log in to your Rollbar account (https://rollbar.com/)
+2. For project tokens: Settings -> Project Access Tokens (for project-level access)
+3. For account tokens: Settings -> Account Access Tokens (for account-level access)
+4. Create a new token with "read" scope
 
 ## How to use
 
-After you clone this repository, below do and setup mcp client.
+After cloning this repository, follow these steps to set up the MCP client:
 
 ```bash
 $ cd mcp-rollbar-server
@@ -77,7 +77,7 @@ Add to your `~/.cursor/mcp.json`:
 }
 ```
 
-For set "YOUR_NODE_PATH", please do `which node`.
+To find the value for "YOUR_NODE_PATH", run `which node` in your terminal.
 
 ## Usage Examples
 
@@ -179,4 +179,3 @@ Get a specific deploy from Rollbar
 - Input:
   - `deployId` (number): Deploy ID
 - Returns: Detailed information about a specific deployment
-
