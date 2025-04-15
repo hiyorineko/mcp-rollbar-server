@@ -48,6 +48,29 @@ You can obtain Rollbar access tokens as follows:
 
 ## How to use
 
+### Cursor Integration
+
+Add to your `~/.cursor/mcp.json`:
+
+```json
+{
+    "mcpServers": {
+      "rollbar-mcp": {
+        "command": "npx",
+        "args": ["-y", "@hiyorineko/mcp-rollbar-server"],
+        "env": {
+          "ROLLBAR_PROJECT_TOKEN": "YOUR_PROJECT_ACCESS_TOKEN",
+          "ROLLBAR_ACCOUNT_TOKEN": "YOUR_ACCOUNT_ACCESS_TOKEN",
+          "ROLLBAR_PROJECT_ID": "YOUR_PROJECT_ID",
+          "ROLLBAR_PROJECT_NAME": "YOUR_PROJECT_NAME"
+        }
+      }
+    }
+}
+```
+
+### Locally
+
 After cloning this repository, follow these steps to set up the MCP client:
 
 ```bash
@@ -55,8 +78,6 @@ $ cd mcp-rollbar-server
 $ npm install
 $ npm run build
 ```
-
-## Cursor Integration
 
 Add to your `~/.cursor/mcp.json`:
 
@@ -77,11 +98,10 @@ Add to your `~/.cursor/mcp.json`:
 }
 ```
 
-To find the value for "YOUR_NODE_PATH", run `which node` in your terminal.
+To find the value for "YOUR_NODE_PATH", run which node in your terminal.
+
 
 ## Usage Examples
-
-### List Recent Errors
 
 ```
 List the most recent errors in my production environment.
