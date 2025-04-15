@@ -352,8 +352,13 @@ export const createServer = () => {
         }
 
         case "rollbar_get_item_by_counter": {
+          // Project Tokenが必要
+          if (!projectClient) {
+            throw new Error("ROLLBAR_PROJECT_TOKEN が設定されていないため、このAPIは使用できません");
+          }
+
           const { counter } = args as { counter: number };
-          const response = await client.get<ItemResponse>(`/item_by_counter/${counter}`);
+          const response = await projectClient.get<ItemResponse>(`/item_by_counter/${counter}`);
           return {
             content: [
               {
