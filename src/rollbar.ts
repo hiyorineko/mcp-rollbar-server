@@ -354,7 +354,7 @@ export const createServer = () => {
           let endpoint = "/occurrences";
           
           if (itemId) {
-            endpoint = `/item/${itemId}/occurrences`;
+            endpoint = `/instances?item_id=${itemId}`;
           }
 
           const response = await projectClient.get<ListOccurrencesResponse>(endpoint, { params });
@@ -375,7 +375,7 @@ export const createServer = () => {
           }
 
           const { id } = args as { id: string };
-          const response = await projectClient.get<OccurrenceResponse>(`/occurrence/${id}`);
+          const response = await projectClient.get<OccurrenceResponse>(`/instance/${id}`);
           return {
             content: [
               {
