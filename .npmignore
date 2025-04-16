@@ -3,4 +3,8 @@ node_modules/
 .git/
 .github/
 .cursor/
-.idea/ 
+.idea/
+test/
+**/*.test.ts
+**/*.test.js
+dist/test/ 

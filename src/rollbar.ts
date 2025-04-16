@@ -16,22 +16,22 @@ import {
   UserResponse,
 } from "./types.js";
 
-// プロジェクトアクセストークンとアカウントアクセストークンの確認
-// Project Access Tokenはプロジェクト固有のAPI（プロジェクト内のアイテム、デプロイなど）に使用
-// Account Access Tokenはアカウント全体のAPI（プロジェクト一覧、ユーザー一覧など）に使用
+// Check for project access token and account access token
+// Project Access Token is used for project-specific APIs (items, deploys, etc. within a project)
+// Account Access Token is used for account-wide APIs (project list, user list, etc.)
 const ROLLBAR_PROJECT_TOKEN = process.env.ROLLBAR_PROJECT_TOKEN;
 const ROLLBAR_ACCOUNT_TOKEN = process.env.ROLLBAR_ACCOUNT_TOKEN;
 
-// このプロジェクトが使用するAPIに基づいて必要なトークンを確認
-// 現在の機能では、最低限どちらか1つは必要
+// Verify the required tokens based on the APIs this project will use
+// For current functionality, at least one of these tokens is required
 if (!ROLLBAR_PROJECT_TOKEN && !ROLLBAR_ACCOUNT_TOKEN) {
-  console.error("少なくとも ROLLBAR_PROJECT_TOKEN または ROLLBAR_ACCOUNT_TOKEN のどちらかが必要です");
+  console.error("At least one of ROLLBAR_PROJECT_TOKEN or ROLLBAR_ACCOUNT_TOKEN is required");
   process.exit(1);
 }
 
-// サポートされる機能の一覧
+// List of supported APIs
 const SUPPORTED_APIS = {
-  // Project Tokenを使用するAPI
+  // APIs that use Project Token
   projectApis: [
     "rollbar_list_items",
     "rollbar_get_item",
@@ -40,89 +40,88 @@ const SUPPORTED_APIS = {
     "rollbar_get_occurrence",
     "rollbar_list_environments",
     "rollbar_list_deploys",
-    "rollbar_get_deploy"
+    "rollbar_get_deploy",
   ],
-  // Account Tokenを使用するAPI
-  accountApis: [
-    "rollbar_list_projects",
-    "rollbar_get_project",
-    "rollbar_list_users",
-    "rollbar_get_user"
-  ]
+  // APIs that use Account Token
+  accountApis: ["rollbar_list_projects", "rollbar_get_project", "rollbar_list_users", "rollbar_get_user"],
 };
 
-// Project APIを使用するが、Project Tokenが設定されていない場合は警告
+// Warning if using Project APIs but Project Token is not set
 if (!ROLLBAR_PROJECT_TOKEN) {
-  console.warn("ROLLBAR_PROJECT_TOKEN が設定されていないため、以下のAPIは使用できません:");
+  console.warn("ROLLBAR_PROJECT_TOKEN is not set, the following APIs will not be available:");
   console.warn(SUPPORTED_APIS.projectApis.join(", "));
 }
 
-// Account APIを使用するが、Account Tokenが設定されていない場合は警告
+// Warning if using Account APIs but Account Token is not set
 if (!ROLLBAR_ACCOUNT_TOKEN) {
-  console.warn("ROLLBAR_ACCOUNT_TOKEN が設定されていないため、以下のAPIは使用できません:");
+  console.warn("ROLLBAR_ACCOUNT_TOKEN is not set, the following APIs will not be available:");
   console.warn(SUPPORTED_APIS.accountApis.join(", "));
 }
 
-// プロジェクト名とIDの環境変数（オプション）
+// Project name and ID environment variables (optional)
 const ROLLBAR_PROJECT_NAME = process.env.ROLLBAR_PROJECT_NAME;
 const ROLLBAR_PROJECT_ID = process.env.ROLLBAR_PROJECT_ID ? parseInt(process.env.ROLLBAR_PROJECT_ID, 10) : undefined;
 
-// プロジェクト名からプロジェクトIDを検索する関数
+// Function to find project ID by name
 const findProjectIdByName = async (projectName: string): Promise<number | undefined> => {
-  // Account Tokenが設定されていない場合は実行できない
+  // Cannot execute if Account Token is not set
   if (!ROLLBAR_ACCOUNT_TOKEN || !accountClient) {
-    console.error("ROLLBAR_ACCOUNT_TOKEN が設定されていないため、プロジェクト名からの検索はできません");
+    console.error("ROLLBAR_ACCOUNT_TOKEN is not set, cannot search for project by name");
     return undefined;
   }
 
   try {
-    const response = await accountClient.get<ListProjectsResponse>('/projects');
+    const response = await accountClient.get<ListProjectsResponse>("/projects");
     const projects = response.data.result;
-    
+
     const project = projects.find((p: RollbarProject) => p.name === projectName);
     return project?.id;
   } catch (error) {
-    console.error('Error finding project by name:', error);
+    console.error("Error finding project by name:", error);
     return undefined;
   }
 };
 
-// 環境変数またはプロジェクト名からプロジェクトIDを取得する関数
+// Function to get project ID from environment variables or project name
 const getEffectiveProjectId = async (providedId?: number): Promise<number | undefined> => {
-  // 提供されたIDがある場合はそれを使用
+  // Use provided ID if available
   if (providedId) return providedId;
-  
-  // 環境変数にプロジェクトIDがある場合はそれを使用
+
+  // Use project ID from environment variable if available
   if (ROLLBAR_PROJECT_ID) return ROLLBAR_PROJECT_ID;
-  
-  // プロジェクト名から検索
+
+  // Search by project name
   if (ROLLBAR_PROJECT_NAME) {
     const idFromName = await findProjectIdByName(ROLLBAR_PROJECT_NAME);
     if (idFromName) return idFromName;
   }
-  
+
   return undefined;
 };
 
 const API_BASE_URL = "https://api.rollbar.com/api/1";
 
-// プロジェクト固有のAPIのためのクライアント（設定されている場合のみ）
-const projectClient = ROLLBAR_PROJECT_TOKEN ? axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    "X-Rollbar-Access-Token": ROLLBAR_PROJECT_TOKEN,
-    "Content-Type": "application/json",
-  },
-}) : null;
+// Client for project-specific APIs (only if set)
+const projectClient = ROLLBAR_PROJECT_TOKEN
+  ? axios.create({
+      baseURL: API_BASE_URL,
+      headers: {
+        "X-Rollbar-Access-Token": ROLLBAR_PROJECT_TOKEN,
+        "Content-Type": "application/json",
+      },
+    })
+  : null;
 
-// アカウント全体のAPIのためのクライアント（設定されている場合のみ）
-const accountClient = ROLLBAR_ACCOUNT_TOKEN ? axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    "X-Rollbar-Access-Token": ROLLBAR_ACCOUNT_TOKEN,
-    "Content-Type": "application/json",
-  },
-}) : null;
+// Client for account-wide APIs (only if set)
+const accountClient = ROLLBAR_ACCOUNT_TOKEN
+  ? axios.create({
+      baseURL: API_BASE_URL,
+      headers: {
+        "X-Rollbar-Access-Token": ROLLBAR_ACCOUNT_TOKEN,
+        "Content-Type": "application/json",
+      },
+    })
+  : null;
 
 const LIST_ITEMS_TOOL: Tool = {
   name: "rollbar_list_items",
@@ -305,12 +304,18 @@ export const createServer = () => {
 
       switch (name) {
         case "rollbar_list_items": {
-          // Project Tokenが必要
+          // Project Token is required
           if (!projectClient) {
-            throw new Error("ROLLBAR_PROJECT_TOKEN が設定されていないため、このAPIは使用できません");
+            throw new Error("ROLLBAR_PROJECT_TOKEN is not set, cannot use this API");
           }
 
-          const { status, level, environment, limit = 20, page = 1 } = args as {
+          const {
+            status,
+            level,
+            environment,
+            limit = 20,
+            page = 1,
+          } = args as {
             status?: string;
             level?: string;
             environment?: string;
@@ -335,9 +340,9 @@ export const createServer = () => {
         }
 
         case "rollbar_get_item": {
-          // Project Tokenが必要
+          // Project Token is required
           if (!projectClient) {
-            throw new Error("ROLLBAR_PROJECT_TOKEN が設定されていないため、このAPIは使用できません");
+            throw new Error("ROLLBAR_PROJECT_TOKEN is not set, cannot use this API");
           }
 
           const { id } = args as { id: number };
@@ -371,12 +376,16 @@ export const createServer = () => {
         }
 
         case "rollbar_list_occurrences": {
-          // Project Tokenが必要
+          // Project Token is required
           if (!projectClient) {
-            throw new Error("ROLLBAR_PROJECT_TOKEN が設定されていないため、このAPIは使用できません");
+            throw new Error("ROLLBAR_PROJECT_TOKEN is not set, cannot use this API");
           }
 
-          const { itemId, limit = 20, page = 1 } = args as {
+          const {
+            itemId,
+            limit = 20,
+            page = 1,
+          } = args as {
             itemId?: number;
             limit?: number;
             page?: number;
@@ -384,9 +393,9 @@ export const createServer = () => {
 
           const params: Record<string, string | number> = { page, limit };
           let endpoint = "/occurrences";
-          
+
           if (itemId) {
-            endpoint = `/item/${itemId}/occurrences`;
+            endpoint = `/instances?item_id=${itemId}`;
           }
 
           const response = await projectClient.get<ListOccurrencesResponse>(endpoint, { params });
@@ -401,13 +410,13 @@ export const createServer = () => {
         }
 
         case "rollbar_get_occurrence": {
-          // Project Tokenが必要
+          // Project Token is required
           if (!projectClient) {
-            throw new Error("ROLLBAR_PROJECT_TOKEN が設定されていないため、このAPIは使用できません");
+            throw new Error("ROLLBAR_PROJECT_TOKEN is not set, cannot use this API");
           }
 
           const { id } = args as { id: string };
-          const response = await projectClient.get<OccurrenceResponse>(`/occurrence/${id}`);
+          const response = await projectClient.get<OccurrenceResponse>(`/instance/${id}`);
           return {
             content: [
               {
@@ -419,9 +428,9 @@ export const createServer = () => {
         }
 
         case "rollbar_list_projects": {
-          // Account Tokenが必要
+          // Account Token is required
           if (!accountClient) {
-            throw new Error("ROLLBAR_ACCOUNT_TOKEN が設定されていないため、このAPIは使用できません");
+            throw new Error("ROLLBAR_ACCOUNT_TOKEN is not set, cannot use this API");
           }
 
           const response = await accountClient.get<ListProjectsResponse>("/projects");
@@ -436,20 +445,20 @@ export const createServer = () => {
         }
 
         case "rollbar_get_project": {
-          // Account Tokenが必要
+          // Account Token is required
           if (!accountClient) {
-            throw new Error("ROLLBAR_ACCOUNT_TOKEN が設定されていないため、このAPIは使用できません");
+            throw new Error("ROLLBAR_ACCOUNT_TOKEN is not set, cannot use this API");
           }
 
           const { id } = args as { id: number };
-          
-          // 環境変数のプロジェクトIDをデフォルト値として使用、またはプロジェクト名から検索
+
+          // Use environment variable project ID as default value, or search by project name
           const effectiveProjectId = await getEffectiveProjectId(id);
-          
+
           if (!effectiveProjectId) {
             throw new Error("Project ID is required but not provided in request or environment variables");
           }
-          
+
           const response = await accountClient.get<ProjectResponse>(`/project/${effectiveProjectId}`);
           return {
             content: [
@@ -462,21 +471,23 @@ export const createServer = () => {
         }
 
         case "rollbar_list_environments": {
-          // Project Tokenが必要
+          // Project Token is required
           if (!projectClient) {
-            throw new Error("ROLLBAR_PROJECT_TOKEN が設定されていないため、このAPIは使用できません");
+            throw new Error("ROLLBAR_PROJECT_TOKEN is not set, cannot use this API");
           }
 
           const { projectId } = args as { projectId: number };
-          
-          // 環境変数のプロジェクトIDをデフォルト値として使用、またはプロジェクト名から検索
+
+          // Use environment variable project ID as default value, or search by project name
           const effectiveProjectId = await getEffectiveProjectId(projectId);
-          
+
           if (!effectiveProjectId) {
             throw new Error("Project ID is required but not provided in request or environment variables");
           }
-          
-          const response = await projectClient.get<ListEnvironmentsResponse>(`/project/${effectiveProjectId}/environments`);
+
+          const response = await projectClient.get<ListEnvironmentsResponse>(
+            `/project/${effectiveProjectId}/environments`,
+          );
           return {
             content: [
               {
@@ -488,9 +499,9 @@ export const createServer = () => {
         }
 
         case "rollbar_list_users": {
-          // Account Tokenが必要
+          // Account Token is required
           if (!accountClient) {
-            throw new Error("ROLLBAR_ACCOUNT_TOKEN が設定されていないため、このAPIは使用できません");
+            throw new Error("ROLLBAR_ACCOUNT_TOKEN is not set, cannot use this API");
           }
 
           const response = await accountClient.get<ListUsersResponse>("/users");
@@ -505,9 +516,9 @@ export const createServer = () => {
         }
 
         case "rollbar_get_user": {
-          // Account Tokenが必要
+          // Account Token is required
           if (!accountClient) {
-            throw new Error("ROLLBAR_ACCOUNT_TOKEN が設定されていないため、このAPIは使用できません");
+            throw new Error("ROLLBAR_ACCOUNT_TOKEN is not set, cannot use this API");
           }
 
           const { id } = args as { id: number };
@@ -523,21 +534,26 @@ export const createServer = () => {
         }
 
         case "rollbar_list_deploys": {
-          // Project Tokenが必要
+          // Project Token is required
           if (!projectClient) {
-            throw new Error("ROLLBAR_PROJECT_TOKEN が設定されていないため、このAPIは使用できません");
+            throw new Error("ROLLBAR_PROJECT_TOKEN is not set, cannot use this API");
           }
 
-          const { projectId, environment, limit = 20, page = 1 } = args as {
+          const {
+            projectId,
+            environment,
+            limit = 20,
+            page = 1,
+          } = args as {
             projectId: number;
             environment?: string;
             limit?: number;
             page?: number;
           };
 
-          // 環境変数のプロジェクトIDをデフォルト値として使用、またはプロジェクト名から検索
+          // Use environment variable project ID as default value, or search by project name
           const effectiveProjectId = await getEffectiveProjectId(projectId);
-          
+
           if (!effectiveProjectId) {
             throw new Error("Project ID is required but not provided in request or environment variables");
           }
@@ -545,7 +561,9 @@ export const createServer = () => {
           const params: Record<string, string | number> = { page, limit };
           if (environment) params.environment = environment;
 
-          const response = await projectClient.get<ListDeploysResponse>(`/project/${effectiveProjectId}/deploys`, { params });
+          const response = await projectClient.get<ListDeploysResponse>(`/project/${effectiveProjectId}/deploys`, {
+            params,
+          });
           return {
             content: [
               {
@@ -557,9 +575,9 @@ export const createServer = () => {
         }
 
         case "rollbar_get_deploy": {
-          // Project Tokenが必要
+          // Project Token is required
           if (!projectClient) {
-            throw new Error("ROLLBAR_PROJECT_TOKEN が設定されていないため、このAPIは使用できません");
+            throw new Error("ROLLBAR_PROJECT_TOKEN is not set, cannot use this API");
           }
 
           const { deployId } = args as { deployId: number };
@@ -584,25 +602,33 @@ export const createServer = () => {
           content: [
             {
               type: "text",
-              text: JSON.stringify({
-                error: "API Error",
-                message: axiosError.message,
-                status: axiosError.response?.status,
-                data: axiosError.response?.data,
-              }, null, 2),
+              text: JSON.stringify(
+                {
+                  error: "API Error",
+                  message: axiosError.message,
+                  status: axiosError.response?.status,
+                  data: axiosError.response?.data,
+                },
+                null,
+                2,
+              ),
             },
           ],
         };
       }
-      // エラーをクライアントに返す（throw ではなく正規の応答として）
+      // Return error to client (not throw as regular response)
       return {
         content: [
           {
             type: "text",
-            text: JSON.stringify({
-              error: "Server Error",
-              message: error instanceof Error ? error.message : String(error),
-            }, null, 2),
+            text: JSON.stringify(
+              {
+                error: "Server Error",
+                message: error instanceof Error ? error.message : String(error),
+              },
+              null,
+              2,
+            ),
           },
         ],
       };

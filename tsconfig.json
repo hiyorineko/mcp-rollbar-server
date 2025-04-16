@@ -12,13 +12,16 @@
     "rootDir": ".",
     "composite": true,
     "incremental": true,
-    "tsBuildInfoFile": "./dist/.tsbuildinfo"
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "isolatedModules": true
   },
   "include": [
     "./**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "test",
+    "**/*.test.ts"
   ]
 }
