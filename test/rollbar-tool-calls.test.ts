@@ -26,6 +26,10 @@ const mockGet = jest.fn().mockImplementation((url: unknown) => {
       return Promise.resolve({ data: mockItemData });
     }
 
+    if (url.includes("/item_by_counter/")) {
+      return Promise.resolve({ data: mockItemData });
+    }
+
     if (url.includes("/instances/")) {
       return Promise.resolve({ data: mockOccurrenceData });
     }
@@ -359,5 +363,31 @@ describe("Rollbar Tool Call Tests", () => {
     // Verify correct URL and parameters were used
     const callArg = mockGet.mock.calls[0][0];
     expect(callArg).toContain("/user/123");
+  });
+
+  test("rollbar_get_item_by_counter", async () => {
+    // Test parameters
+    const params = { counter: 42 };
+
+    // Direct API call test
+    await mockGet("/api/1/item_by_counter/42");
+    expect(mockGet).toHaveBeenCalled();
+
+    // Verify correct URL and parameters were used
+    const callArg = mockGet.mock.calls[0][0];
+    expect(callArg).toContain("/item_by_counter/42");
+  });
+
+  test("rollbar_get_item_by_occurrence_uuid", async () => {
+    // Test parameters
+    const params = { uuid: "abcd1234" };
+
+    // Direct API call test
+    await mockGet("/api/1/item/abcd1234");
+    expect(mockGet).toHaveBeenCalled();
+
+    // Verify correct URL and parameters were used
+    const callArg = mockGet.mock.calls[0][0];
+    expect(callArg).toContain("/item/abcd1234");
   });
 });

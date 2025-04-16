@@ -139,13 +139,13 @@ List items (errors) from Rollbar
 - Returns: List of error items with details such as counter, level, total occurrences, etc.
 
 ### rollbar_get_item
-Get a specific item (error) from Rollbar
+Get a specific item (error) from Rollbar using the internal item ID maintained by Rollbar's system.
 - Input:
   - `id` (number): Item ID
 - Returns: Detailed information about a specific error item
 
 ### rollbar_get_item_by_counter
-Get a specific item by project counter from Rollbar
+Get a specific item by project counter from Rollbar. The counter is the visible ID that appears in the Rollbar UI.
 - Input:
   - `counter` (number): Project counter for the item
 - Returns: Detailed information about a specific error item identified by its project counter

@@ -140,7 +140,7 @@ const LIST_ITEMS_TOOL: Tool = {
 
 const GET_ITEM_TOOL: Tool = {
   name: "rollbar_get_item",
-  description: "Get a specific item (error) from Rollbar",
+  description: "Get a specific item (error) from Rollbar using the internal item ID maintained by Rollbar's system.",
   inputSchema: {
     type: "object",
     properties: {
@@ -150,9 +150,23 @@ const GET_ITEM_TOOL: Tool = {
   },
 };
 
+const GET_ITEM_BY_UUID_TOOL: Tool = {
+  name: "rollbar_get_item_by_occurrence_uuid",
+  description:
+    "Get a specific item (error) from Rollbar using an occurrence UUID. The UUID must be from an occurrence that belongs to the item.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      uuid: { type: "string", description: "Occurrence UUID" },
+    },
+    required: ["uuid"],
+  },
+};
+
 const GET_ITEM_BY_COUNTER_TOOL: Tool = {
   name: "rollbar_get_item_by_counter",
-  description: "Get a specific item by project counter from Rollbar.",
+  description:
+    "Get a specific item by project counter from Rollbar. The counter is the visible ID that appears in the Rollbar UI.",
   inputSchema: {
     type: "object",
     properties: {
@@ -285,6 +299,7 @@ export const createServer = () => {
     tools: [
       LIST_ITEMS_TOOL,
       GET_ITEM_TOOL,
+      GET_ITEM_BY_UUID_TOOL,
       GET_ITEM_BY_COUNTER_TOOL,
       LIST_OCCURRENCES_TOOL,
       GET_OCCURRENCE_TOOL,
@@ -347,6 +362,24 @@ export const createServer = () => {
 
           const { id } = args as { id: number };
           const response = await projectClient.get<ItemResponse>(`/item/${id}`);
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(response.data, null, 2),
+              },
+            ],
+          };
+        }
+
+        case "rollbar_get_item_by_occurrence_uuid": {
+          // Project Token is required
+          if (!projectClient) {
+            throw new Error("ROLLBAR_PROJECT_TOKEN is not set, cannot use this API");
+          }
+
+          const { uuid } = args as { uuid: string };
+          const response = await projectClient.get<ItemResponse>(`/item/${uuid}`);
           return {
             content: [
               {
