@@ -35,6 +35,7 @@ const SUPPORTED_APIS = {
   projectApis: [
     "rollbar_list_items",
     "rollbar_get_item",
+    "rollbar_get_item_by_counter",
     "rollbar_list_occurrences",
     "rollbar_get_occurrence",
     "rollbar_list_environments",
@@ -146,6 +147,18 @@ const GET_ITEM_TOOL: Tool = {
       id: { type: "number", description: "Item ID" },
     },
     required: ["id"],
+  },
+};
+
+const GET_ITEM_BY_COUNTER_TOOL: Tool = {
+  name: "rollbar_get_item_by_counter",
+  description: "Get a specific item by project counter from Rollbar.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      counter: { type: "number", description: "Project counter for the item" },
+    },
+    required: ["counter"],
   },
 };
 
@@ -272,6 +285,7 @@ export const createServer = () => {
     tools: [
       LIST_ITEMS_TOOL,
       GET_ITEM_TOOL,
+      GET_ITEM_BY_COUNTER_TOOL,
       LIST_OCCURRENCES_TOOL,
       GET_OCCURRENCE_TOOL,
       LIST_PROJECTS_TOOL,
@@ -333,6 +347,24 @@ export const createServer = () => {
 
           const { id } = args as { id: number };
           const response = await projectClient.get<ItemResponse>(`/item/${id}`);
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(response.data, null, 2),
+              },
+            ],
+          };
+        }
+
+        case "rollbar_get_item_by_counter": {
+          // Project Tokenが必要
+          if (!projectClient) {
+            throw new Error("ROLLBAR_PROJECT_TOKEN が設定されていないため、このAPIは使用できません");
+          }
+
+          const { counter } = args as { counter: number };
+          const response = await projectClient.get<ItemResponse>(`/item_by_counter/${counter}`);
           return {
             content: [
               {

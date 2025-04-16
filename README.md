@@ -30,6 +30,7 @@ MCP server implementation for Rollbar API integration, enabling LLMs to interact
 |-----|-------------|
 | `rollbar_list_items` | ROLLBAR_PROJECT_TOKEN |
 | `rollbar_get_item` | ROLLBAR_PROJECT_TOKEN |
+| `rollbar_get_item_by_counter` | ROLLBAR_PROJECT_TOKEN |
 | `rollbar_list_occurrences` | ROLLBAR_PROJECT_TOKEN |
 | `rollbar_get_occurrence` | ROLLBAR_PROJECT_TOKEN |
 | `rollbar_list_environments` | ROLLBAR_PROJECT_TOKEN |
@@ -142,6 +143,12 @@ Get a specific item (error) from Rollbar
 - Input:
   - `id` (number): Item ID
 - Returns: Detailed information about a specific error item
+
+### rollbar_get_item_by_counter
+Get a specific item by project counter from Rollbar
+- Input:
+  - `counter` (number): Project counter for the item
+- Returns: Detailed information about a specific error item identified by its project counter
 
 ### rollbar_list_occurrences
 List occurrences of errors from Rollbar
