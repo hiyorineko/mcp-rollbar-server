@@ -391,9 +391,9 @@ export const createServer = () => {
         }
 
         case "rollbar_get_item_by_counter": {
-          // Project Tokenが必要
+          // Project Token is required
           if (!projectClient) {
-            throw new Error("ROLLBAR_PROJECT_TOKEN が設定されていないため、このAPIは使用できません");
+            throw new Error("ROLLBAR_PROJECT_TOKEN is not set, cannot use this API");
           }
 
           const { counter } = args as { counter: number };
@@ -428,7 +428,7 @@ export const createServer = () => {
           let endpoint = "/occurrences";
 
           if (itemId) {
-            endpoint = `/instances?item_id=${itemId}`;
+            endpoint = `/item/${itemId}/instances`;
           }
 
           const response = await projectClient.get<ListOccurrencesResponse>(endpoint, { params });

@@ -243,12 +243,12 @@ describe("Rollbar Tool Call Tests", () => {
     };
 
     // Direct API call test
-    await mockGet("/api/1/item/123/occurrences?limit=10&page=1");
+    await mockGet("/api/1/item/123/instances?limit=10&page=1");
     expect(mockGet).toHaveBeenCalled();
 
     // Verify correct URL and parameters were used
     const callArg = mockGet.mock.calls[0][0];
-    expect(callArg).toContain("/item/123/occurrences");
+    expect(callArg).toContain("/item/123/instances");
     expect(callArg).toContain("limit=10");
     expect(callArg).toContain("page=1");
   });
