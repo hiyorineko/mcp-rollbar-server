@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.3] - 2024-04-16
+## [1.1.4] - 2025-04-16
+
+### Fixed
+- Fixed `rollbar_list_occurrences` endpoint to correctly use `/item/{item_id}/instances` as specified in the API documentation
+- Standardized error messages to English for consistency
+
+## [1.1.3] - 2025-04-16
 
 ### Added
 - Added new `rollbar_get_item_by_occurrence_uuid` tool for retrieving items by occurrence UUID
@@ -14,19 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Renamed and improved tool naming to better match Rollbar API documentation
 
-## [1.1.2] - 2024-04-15
+## [1.1.2] - 2025-04-15
 
 ### Changed
 - Internationalization: Translated all Japanese comments and error messages to English
 - Build optimization: Excluded test files from TypeScript compilation
 - Package optimization: Limited files included in npm package to only necessary modules
 
-## [1.1.1] - 2024-04-15
+## [1.1.1] - 2025-04-15
 
 ### Fixed
 - Minor bug fixes and improvements
 
-## [1.1.0] - 2024-04-15
+## [1.1.0] - 2025-04-15
 
 ### Added
 - Environment variable expansion: Added support for `ROLLBAR_PROJECT_TOKEN` and `ROLLBAR_ACCOUNT_TOKEN`
@@ -39,7 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated README to explain the usage of new environment variables
 - Modified to work with only the necessary tokens depending on the API used (both tokens are no longer required)
 
-## [1.0.0] - 2024-04-15
+## [1.0.0] - 2025-04-15
 
 ### Added
 - Initial release with Rollbar API integration
