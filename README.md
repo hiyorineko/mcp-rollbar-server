@@ -1,7 +1,11 @@
 # Rollbar MCP Server
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-MCP server implementation for Rollbar API integration, enabling LLMs to interact with Rollbar error tracking data.
+A dynamic MCP server implementation for Rollbar API integration, enabling LLMs to interact with Rollbar error tracking data.
+
+<a href="https://glama.ai/mcp/servers/@hiyorineko/mcp-rollbar-server">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@hiyorineko/mcp-rollbar-server/badge" alt="Rollbar Server MCP server" />
+</a>
 
 ## Features
 
@@ -100,7 +104,6 @@ Add to your `~/.cursor/mcp.json`:
 ```
 
 To find the value for "YOUR_NODE_PATH", run which node in your terminal.
-
 
 ## Usage Examples
 
